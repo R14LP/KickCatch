@@ -18,7 +18,7 @@ If you are a developer and want to run or modify the code from the source, you n
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/R14LP/KickCatch.git](https://github.com/R14LP/KickCatch.git)
+    git clone https://github.com/R14LP/KickCatch.git
     cd KickCatch
     ```
 
