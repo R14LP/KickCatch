@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KickCatch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://js.pusher.com/8.0/pusher.min.js"></script>
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-card">
+        <div class="login-logo">
+            <div class="logo-icon">K</div>
+            <h1>KickCatch</h1>
+        </div>
+
+        <div id="saved-profiles-view" class="hidden">
+            <div id="profiles-list"></div>
+            <button id="btn-show-new-login" class="btn-ghost mt-3">+ Connect different account</button>
+        </div>
+
+        <div id="new-login-view">
+            <p class="login-hint">Connect your Kick account to get started</p>
+            <button id="btn-oauth-login" class="btn-primary btn-kick">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+                Login with Kick
+            </button>
+            <button id="btn-back-profiles" class="btn-ghost hidden">← Back</button>
+        </div>
+
+        <div id="login-status" class="hidden"></div>
+
+        <select id="login-lang-toggle" class="lang-select">
+            <option value="en">EN</option>
+            <option value="tr">TR</option>
+        </select>
+    </div>
+</div>
+
+<div id="main-app" class="hidden">
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <span class="app-name">KickCatch</span>
+            <span id="active-user-badge"></span>
+        </div>
+
+        <div class="toolbar-center">
+            <div class="open-controls">
+                <input type="number" id="link-count" min="1" max="10" value="1">
+                <select id="link-order">
+                    <option value="start" id="opt-start">Start</option>
+                    <option value="end" id="opt-end">End</option>
+                    <option value="random" id="opt-random">Random</option>
+                </select>
+                <button id="btn-open" class="btn-primary">Open</button>
+            </div>
+            <button id="btn-bonk" class="btn-bonk">Bonk!</button>
+            <button id="btn-spam-delete" class="btn-danger" title="Delete spam links">Spam Sil</button>
+        </div>
+
+        <div class="toolbar-right">
+            <div class="ban-wrapper" id="ban-wrapper">
+                <button id="btn-ban" class="btn-outline">Ban</button>
+                <input type="text" id="ban-input" placeholder="Username...">
+            </div>
+            <button id="btn-hide-links" class="btn-outline">Hide</button>
+            <div id="last-opened-badge" class="hidden">
+                <span id="last-opened-count"></span>
+            </div>
+            <select id="app-lang-toggle" class="lang-select">
+                <option value="en">EN</option>
+                <option value="tr">TR</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="spam-alert" class="spam-alert hidden">
+        <span id="spam-alert-text"></span>
+        <button id="spam-alert-close">×</button>
+    </div>
+
+    <div id="links-container"></div>
+</div>
+
+<div id="delete-modal" class="modal hidden">
+    <div class="modal-content">
+        <p id="delete-modal-text"></p>
+        <div class="modal-actions">
+            <button id="btn-confirm-delete" class="btn-danger">Delete</button>
+            <button id="btn-cancel-delete" class="btn-ghost">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="emote-container" class="hidden">
+    <img src="{{ url_for('static', filename='img/bonk.gif') }}" alt="Bonk" id="bonk-emote">
+    <div id="bonk-names"></div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
