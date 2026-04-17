@@ -5,12 +5,11 @@ KickCatch is a lightweight, local web-based tool designed to capture and manage 
 ## ✨ Features
 
 -   **Real-time Link Capturing:** Connects directly to Kick's WebSocket (Pusher) infrastructure to instantly catch links.
--   **Safe Viewing (Pop-up Blocker Aware):** Links are queued in a FIFO structure and can be opened in background tabs securely.
+-   **Safe Viewing:** Links are queued in a FIFO structure and can be safely opened in background tabs.
 -   **Multiple Link Opening:** Open a batch of queued links at once (Start, End, or Random selections).
 -   **Authentication & Moderation:** Authenticate with your Kick account via OAuth to enable advanced features like instant banning.
 -   **"Bonk!" System:** Quickly view a history of recently opened links and the usernames who sent them, complete with an animated "Bonk!" emote for misbehaving viewers.
 -   **Spam Detection:** Automatically detects and filters out repeated links or spamming behavior.
--   **Dark/Grid Theme Aesthetic:** Designed with a clean, terminal-like interface.
 -   **Bilingual Support:** Fully supports English and Turkish (TR/EN).
 
 ## 🚀 Installation & Setup (Running from Source)
@@ -19,7 +18,7 @@ If you are a developer and want to run or modify the code from the source, you n
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/YourUsername/KickCatch.git](https://github.com/YourUsername/KickCatch.git)
+    git clone [https://github.com/R14LP/KickCatch.git](https://github.com/R14LP/KickCatch.git)
     cd KickCatch
     ```
 
@@ -44,22 +43,21 @@ If you are a developer and want to run or modify the code from the source, you n
 
 ## 🔨 How to Build (Create your own .exe)
 
-If you prefer to compile the application into a standalone executable (`.exe`) file yourself, follow these steps:
+To compile the application into a standalone executable (`.exe`) file, follow these steps:
 
 1.  **Install PyInstaller:**
-    Make sure you are in your project directory and run:
     ```bash
-    pip install pyinstaller
+    pip install pyinstaller python-dotenv
     ```
 
 2.  **Run the build command:**
-    This command bundles the Python script along with the `templates`, `static`, and `.env` files into a single directory:
+    This command bundles the Python script along with the required folders. (Note: It does NOT embed the .env file for security reasons).
     ```bash
-    pyinstaller --noconfirm --onedir --windowed --add-data "templates;templates" --add-data "static;static" --add-data ".env;." app.py
+    pyinstaller --noconfirm --onedir --windowed --add-data "templates;templates" --add-data "static;static" app.py
     ```
 
 3.  **Run your build:**
-    Once the process is complete, navigate to the newly created `dist/app` folder. You can launch the application by running `app.exe`.
+    Go to the newly created `dist/app` folder. Make sure your `.env` file is placed in this folder next to `app.exe`, then double-click `app.exe` to run it.
 
 ## 🛠️ Tech Stack
 
