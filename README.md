@@ -15,9 +15,11 @@ KickCatch is a lightweight, local web-based tool designed to capture and manage 
 
 ## 🚀 Installation & Setup (Running from Source)
 
+If you are a developer and want to run or modify the code from the source, you need to set up your own Kick API credentials.
+
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/R14LP/KickCatch.git
+    git clone [https://github.com/YourUsername/KickCatch.git](https://github.com/YourUsername/KickCatch.git)
     cd KickCatch
     ```
 
@@ -26,7 +28,15 @@ KickCatch is a lightweight, local web-based tool designed to capture and manage 
     pip install -r requirements.txt
     ```
 
-3.  **Run the application:**
+3.  **Setup Environment Variables (.env):**
+    - Go to the [Kick Developer Portal](https://kick.com/settings/developer).
+    - Create a new application.
+    - Set the **Redirect URI** to: `http://localhost:5050/auth/callback`
+    - Copy the `Client ID` and `Client Secret`.
+    - Rename the `.env.example` file to `.env` in your project folder.
+    - Paste your keys into the `.env` file.
+
+4.  **Run the application:**
     ```bash
     python app.py
     ```
