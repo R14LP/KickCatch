@@ -10,24 +10,26 @@ const T = {
         deletePrompt: "Delete account '{user}'?",
         btnDelete: "Delete", btnCancel: "Cancel",
         lastOpened: "Last: {n}",
-        spamAlert: "Spam detected: {users} — {n} links removed",
+        spamAlert: "Spam removed: {users} ({n} links deleted)",
         banSuccess: "Banned {user}", banFail: "Ban failed",
-        notAuth: "No authenticated account selected",
+        notAuth: "No authenticated account",
+        filterAll: "All",
     },
     tr: {
         loginHint: "Başlamak için Kick hesabını bağla",
         btnLogin: "Kick ile Giriş Yap",
         loginDiffAcc: "+ Farklı hesap bağla",
         optStart: "Baştan", optEnd: "Sondan", optRandom: "Rastgele",
-        btnOpen: "Aç", btnBonk: "Döv!", btnBan: "Banla",
+        btnOpen: "Aç", btnBonk: "Bonk!", btnBan: "Banla",
         btnSpamDelete: "Spam Sil", btnHide: "Gizle", btnShow: "Göster",
         banPlaceholder: "Kullanıcı adı...",
         deletePrompt: "'{user}' hesabını sil?",
         btnDelete: "Sil", btnCancel: "İptal",
         lastOpened: "Son: {n}",
-        spamAlert: "Spam: {users} — {n} link silindi",
+        spamAlert: "Spam silindi: {users} ({n} link)",
         banSuccess: "{user} banlandı", banFail: "Ban başarısız",
         notAuth: "Giriş yapılmış hesap yok",
+        filterAll: "Hepsi",
     }
 };
 
@@ -41,6 +43,7 @@ let accountToDelete = null;
 let activeUser = null;
 let activeBroadcasterId = null;
 let linksHidden = false;
+let activeFilter = 'all';
 
 const $ = id => document.getElementById(id);
 
@@ -53,11 +56,9 @@ const btnBackProfiles   = $('btn-back-profiles');
 const mainApp           = $('main-app');
 const activeUserBadge   = $('active-user-badge');
 const loginStatus       = $('login-status');
-
 const loginLangToggle   = $('login-lang-toggle');
 const appLangToggle     = $('app-lang-toggle');
 const btnOauthLogin     = $('btn-oauth-login');
-
 const optStart          = $('opt-start');
 const optEnd            = $('opt-end');
 const optRandom         = $('opt-random');
@@ -83,7 +84,7 @@ const spamAlert         = $('spam-alert');
 const spamAlertText     = $('spam-alert-text');
 const spamAlertClose    = $('spam-alert-close');
 
-const trashSVG = `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>`;
+const trashSVG = `<svg viewBox="0 0 24 24" width="15" height="15"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>`;
 
 function t(key, vars = {}) {
     let s = T[lang][key] || key;
@@ -92,9 +93,9 @@ function t(key, vars = {}) {
 }
 
 function updateLang() {
+    document.querySelector('.login-hint') && (document.querySelector('.login-hint').textContent = t('loginHint'));
     if (btnOauthLogin) btnOauthLogin.textContent = t('btnLogin');
     if (btnShowNewLogin) btnShowNewLogin.textContent = t('loginDiffAcc');
-    document.querySelector('.login-hint') && (document.querySelector('.login-hint').textContent = t('loginHint'));
     if (optStart) optStart.textContent = t('optStart');
     if (optEnd) optEnd.textContent = t('optEnd');
     if (optRandom) optRandom.textContent = t('optRandom');
@@ -106,6 +107,8 @@ function updateLang() {
     if (btnConfirmDelete) btnConfirmDelete.textContent = t('btnDelete');
     if (btnCancelDelete) btnCancelDelete.textContent = t('btnCancel');
     if (btnHideLinks) btnHideLinks.textContent = linksHidden ? t('btnShow') : t('btnHide');
+    const btnFilterAll = $('btn-filter-all');
+    if (btnFilterAll) btnFilterAll.textContent = t('filterAll');
     if (accountToDelete && deleteModalText) {
         deleteModalText.textContent = t('deletePrompt', { user: accountToDelete });
     }
@@ -126,12 +129,12 @@ function initLoginScreen() {
     if (savedAccounts.length > 0) {
         savedProfilesView.classList.remove('hidden');
         newLoginView.classList.add('hidden');
-        btnBackProfiles.classList.remove('hidden');
+        btnBackProfiles?.classList.remove('hidden');
         renderProfiles();
     } else {
         savedProfilesView.classList.add('hidden');
         newLoginView.classList.remove('hidden');
-        btnBackProfiles.classList.add('hidden');
+        btnBackProfiles?.classList.add('hidden');
     }
 }
 
@@ -152,7 +155,6 @@ function renderProfiles() {
         trash.addEventListener('click', e => {
             e.stopPropagation();
             accountToDelete = acc.username;
-            updateLang();
             deleteModalText.textContent = t('deletePrompt', { user: acc.username });
             deleteModal.classList.remove('hidden');
         });
@@ -173,9 +175,7 @@ btnBackProfiles?.addEventListener('click', () => {
     newLoginView.classList.add('hidden');
 });
 
-btnOauthLogin?.addEventListener('click', () => {
-    window.location.href = '/auth/login';
-});
+btnOauthLogin?.addEventListener('click', () => { window.location.href = '/auth/login'; });
 
 btnCancelDelete?.addEventListener('click', () => {
     deleteModal.classList.add('hidden');
@@ -208,15 +208,15 @@ async function connectToKick(username) {
         activeBroadcasterId = data.broadcaster_id || null;
         activeUserBadge.textContent = `@${username}`;
 
+        if (pusher) pusher.disconnect();
         pusher = new Pusher('32cbd69e4b950bf97679', { cluster: 'us2', forceTLS: true });
         chatChannel = pusher.subscribe(`chatrooms.${data.id}.v2`);
 
         chatChannel.bind('App\\Events\\ChatMessageEvent', eventData => {
-            console.log('Pusher event:', JSON.stringify(eventData));
             const urls = (eventData.content || '').match(/(https?:\/\/[^\s]+)/g);
             if (!urls) return;
             const sender = eventData.sender || {};
-            const isSub = sender.is_subscribed || sender.identity?.color != null || false;
+            const isSub = !!(sender.is_subscribed || (sender.identity && sender.identity.badge));
             const uname = sender.username || sender.slug || sender.name || '?';
             urls.forEach(url => {
                 linksQueue.push({
@@ -226,10 +226,8 @@ async function connectToKick(username) {
                     opened: false,
                     isSub,
                     time: new Date(),
-                    spam: false,
                 });
             });
-            detectSpam();
             renderLinks();
         });
 
@@ -237,59 +235,56 @@ async function connectToKick(username) {
         mainApp.classList.remove('hidden');
     } catch (e) {
         console.error(e);
-        alert('Connection failed');
+        alert('Connection failed: ' + e.message);
     }
 }
 
-// ── SPAM DETECTION ──
-function detectSpam() {
-    const SPAM_SAME_URL = 2;
-    const SPAM_BURST_COUNT = 5;
-    const SPAM_BURST_WINDOW = 30000;
-
-    const urlCounts = {};
-    const userTimestamps = {};
-
-    linksQueue.forEach(link => {
-        if (link.opened) return;
-        urlCounts[link.url] = (urlCounts[link.url] || 0) + 1;
-        if (!userTimestamps[link.username]) userTimestamps[link.username] = [];
-        userTimestamps[link.username].push(link.time);
-    });
-
-    const spamUsers = new Set();
-    const spamUrls = new Set();
-
-    for (const [url, count] of Object.entries(urlCounts)) {
-        if (count >= SPAM_SAME_URL) spamUrls.add(url);
-    }
-
-    const now = Date.now();
-    for (const [user, times] of Object.entries(userTimestamps)) {
-        const recent = times.filter(t => now - t.getTime() < SPAM_BURST_WINDOW);
-        if (recent.length >= SPAM_BURST_COUNT) spamUsers.add(user);
-    }
-
-    linksQueue.forEach(link => {
-        link.spam = spamUsers.has(link.username) || spamUrls.has(link.url);
-    });
+function matchesFilter(url) {
+    if (activeFilter === 'all') return true;
+    try {
+        const host = new URL(url).hostname.toLowerCase().replace('www.', '');
+        const filters = activeFilter.split(' ');
+        return filters.some(f => host.includes(f));
+    } catch { return false; }
 }
+
+document.querySelectorAll('.btn-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        renderLinks();
+    });
+});
 
 btnSpamDelete?.addEventListener('click', () => {
-    const spamLinks = linksQueue.filter(l => l.spam && !l.opened);
-    if (spamLinks.length === 0) return;
+    const seenUrls = new Set();
+    const toDelete = new Set();
+    const spamUsers = new Set();
 
-    const users = [...new Set(spamLinks.map(l => l.username))].join(', ');
-    linksQueue = linksQueue.filter(l => !l.spam);
+    [...linksQueue].forEach(link => {
+        if (link.opened) return;
+        if (seenUrls.has(link.url)) {
+            toDelete.add(link.id);
+            spamUsers.add(link.username);
+        } else {
+            seenUrls.add(link.url);
+        }
+    });
 
-    spamAlertText.textContent = t('spamAlert', { users, n: spamLinks.length });
+    if (toDelete.size === 0) return;
+
+    const users = [...spamUsers].join(', ');
+    const count = toDelete.size;
+    linksQueue = linksQueue.filter(l => !toDelete.has(l.id));
+
+    spamAlertText.textContent = t('spamAlert', { users, n: count });
     spamAlert.classList.remove('hidden');
     renderLinks();
 });
 
 spamAlertClose?.addEventListener('click', () => spamAlert.classList.add('hidden'));
 
-// ── RENDER ──
 function getFavicon(url) {
     try {
         const domain = new URL(url).hostname;
@@ -303,12 +298,12 @@ function timeStr(date) {
 
 function renderLinks() {
     if (linksHidden) return;
+    const visible = linksQueue.filter(l => matchesFilter(l.url));
     linksContainer.innerHTML = '';
-    linksQueue.forEach(link => {
+    visible.forEach(link => {
         const div = document.createElement('div');
         div.className = 'link-block';
         if (link.opened) div.classList.add('opened');
-        if (link.spam) div.classList.add('spam-link');
 
         const favicon = getFavicon(link.url);
         const faviconHTML = favicon
@@ -316,7 +311,7 @@ function renderLinks() {
             : '';
 
         div.innerHTML = `
-            <div class="link-username ${link.opened ? 'opened' : ''}">
+            <div class="link-username ${link.opened ? 'dimmed' : ''}">
                 ${link.username}
                 ${link.isSub ? '<span class="sub-badge">SUB</span>' : ''}
             </div>
@@ -359,7 +354,6 @@ function updateLastOpenedBadge() {
     }
 }
 
-// ── OPEN BUTTON ──
 linkCountInput?.addEventListener('change', function () {
     let v = parseInt(this.value);
     if (isNaN(v) || v < 1) this.value = 1;
@@ -369,7 +363,7 @@ linkCountInput?.addEventListener('change', function () {
 btnOpen?.addEventListener('click', () => {
     let count = parseInt(linkCountInput.value);
     const order = linkOrderSelect.value;
-    const available = linksQueue.filter(l => !l.opened);
+    const available = linksQueue.filter(l => !l.opened && matchesFilter(l.url));
     if (!available.length) return;
     if (count > available.length) count = available.length;
 
@@ -379,7 +373,6 @@ btnOpen?.addEventListener('click', () => {
     else toOpen = [...available].sort(() => 0.5 - Math.random()).slice(0, count);
 
     lastOpened = [...toOpen];
-
     toOpen.forEach(link => {
         link.opened = true;
         const a = document.createElement('a');
@@ -395,7 +388,6 @@ btnOpen?.addEventListener('click', () => {
     renderLinks();
 });
 
-// ── BONK ──
 btnBonk?.addEventListener('click', () => {
     if (!lastOpened.length) return;
     bonkNames.innerHTML = lastOpened.map((l, i) => `<div>${i + 1}. ${l.username}</div>`).join('');
@@ -403,7 +395,6 @@ btnBonk?.addEventListener('click', () => {
     setTimeout(() => emoteContainer.classList.add('hidden'), 4000);
 });
 
-// ── BAN ──
 btnBan?.addEventListener('click', () => {
     banWrapper.classList.toggle('show-search');
     if (banWrapper.classList.contains('show-search')) banInput.focus();
@@ -412,9 +403,7 @@ btnBan?.addEventListener('click', () => {
 banInput?.addEventListener('keydown', async e => {
     if (e.key !== 'Enter') return;
     const target = banInput.value.trim();
-    if (!target || !activeUser) return;
-
-    if (!activeUser) { alert(t('notAuth')); return; }
+    if (!target || !activeUser) { alert(t('notAuth')); return; }
 
     const res = await fetch('/api/ban', {
         method: 'POST',
@@ -432,17 +421,14 @@ banInput?.addEventListener('keydown', async e => {
     banWrapper.classList.remove('show-search');
 });
 
-// ── HIDE/SHOW ──
 btnHideLinks?.addEventListener('click', () => {
     linksHidden = !linksHidden;
     btnHideLinks.textContent = linksHidden ? t('btnShow') : t('btnHide');
     linksContainer.style.display = linksHidden ? 'none' : '';
 });
 
-// ── INIT ──
 async function init() {
     await loadAccounts();
-
     const params = new URLSearchParams(window.location.search);
     const loggedIn = params.get('logged_in');
     if (loggedIn) {
@@ -450,10 +436,9 @@ async function init() {
         loginStatus.textContent = `✓ Connected as @${loggedIn}`;
         loginStatus.classList.remove('hidden', 'error');
         await loadAccounts();
-        setTimeout(() => connectToKick(loggedIn), 800);
+        setTimeout(() => connectToKick(loggedIn), 600);
         return;
     }
-
     initLoginScreen();
     updateLang();
 }

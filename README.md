@@ -5,16 +5,17 @@ KickCatch is a lightweight, local web-based tool designed to capture and manage 
 ## ✨ Features
 
 -   **Real-time Link Capturing:** Connects directly to Kick's WebSocket (Pusher) infrastructure to instantly catch links.
--   **Safe Viewing:** Links are queued in a FIFO structure and can be safely opened in background tabs.
--   **Multiple Link Opening:** Open a batch of queued links at once (Start, End, or Random selections).
--   **Authentication & Moderation:** Authenticate with your Kick account via OAuth to enable advanced features like instant banning.
--   **"Bonk!" System:** Quickly view a history of recently opened links and the usernames who sent them, complete with an animated "Bonk!" emote for misbehaving viewers.
--   **Spam Detection:** Automatically detects and filters out repeated links or spamming behavior.
+-   **Safe Viewing:** Links are queued and can be safely opened in background tabs.
+-   **Multiple Link Opening:** Open a batch of queued links at once (Start, End, or Random).
+-   **Platform Filters:** Filter links by platform — YouTube, Instagram, X/Twitter, TikTok.
+-   **OAuth Authentication:** Login with your Kick account securely via OAuth 2.1 — your password is never stored.
+-   **Ban System:** Instantly ban users directly from the panel using the official Kick Moderation API.
+-   **"Bonk!" System:** View recently opened links and who sent them, with an animated emote.
+-   **Spam Detection:** Removes duplicate links — keeps the first occurrence, deletes the rest.
+-   **System Tray:** Runs in the background with a system tray icon. Use "Exit" to fully close.
 -   **Bilingual Support:** Fully supports English and Turkish (TR/EN).
 
 ## 🚀 Installation & Setup (Running from Source)
-
-If you are a developer and want to run or modify the code from the source, you need to set up your own Kick API credentials.
 
 1.  **Clone the repository:**
     ```bash
@@ -32,43 +33,43 @@ If you are a developer and want to run or modify the code from the source, you n
     - Create a new application.
     - Set the **Redirect URI** to: `http://localhost:5050/auth/callback`
     - Copy the `Client ID` and `Client Secret`.
-    - Rename the `.env.example` file to `.env` in your project folder.
-    - Paste your keys into the `.env` file.
+    - Rename `.env.example` to `.env` and fill in your keys.
 
-4.  **Run the application:**
+4.  **Run:**
     ```bash
     python app.py
     ```
-    The application will automatically launch your default browser and navigate to `http://127.0.0.1:5050/`.
+    The app will open in your browser at `http://localhost:5050/` and appear in the system tray.
 
-## 🔨 How to Build (Create your own .exe)
+## 🔨 How to Build (.exe)
 
-To compile the application into a standalone executable (`.exe`) file, follow these steps:
-
-1.  **Install PyInstaller:**
+1.  **Install build tools:**
     ```bash
-    pip install pyinstaller python-dotenv
+    pip install pyinstaller
     ```
 
-2.  **Run the build command:**
-    This command bundles the Python script along with the required folders. (Note: It does NOT embed the .env file for security reasons).
+2.  Place `icon.ico` in the root folder (next to `app.py`).
+
+3.  **Build:**
     ```bash
-    pyinstaller --noconfirm --onedir --windowed --add-data "templates;templates" --add-data "static;static" app.py
+    pyinstaller --noconfirm --onedir --windowed --name "KickCatch" --icon "icon.ico" --add-data "templates;templates" --add-data "static;static" app.py
     ```
 
-3.  **Run your build:**
-    Go to the newly created `dist/app` folder. Make sure your `.env` file is placed in this folder next to `app.exe`, then double-click `app.exe` to run it.
+4.  Go to `dist/KickCatch/`, place your `.env` file next to `KickCatch.exe`, and run it.
 
 ## 🛠️ Tech Stack
 
 -   **Backend:** Python, Flask
 -   **Frontend:** HTML, Vanilla JavaScript, Custom CSS
 -   **WebSocket:** Pusher (js.pusher.com)
--   **Protection Bypass:** Cloudscraper
+-   **Auth:** Kick OAuth 2.1 + PKCE
+-   **Cloudflare Bypass:** Cloudscraper
+-   **System Tray:** pystray, Pillow
 
 ## ⚠️ Disclaimer
 
-This tool is created for educational and moderation purposes. Kick.com may update their API or Cloudflare protections at any time, which could temporarily affect the functionality of this application.
+This tool is for educational and moderation purposes. Kick.com may update their API or Cloudflare protections at any time, which could temporarily affect functionality.
 
 ## 📄 License
+
 MIT License

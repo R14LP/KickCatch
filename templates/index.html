@@ -25,10 +25,7 @@
 
         <div id="new-login-view">
             <p class="login-hint">Connect your Kick account to get started</p>
-            <button id="btn-oauth-login" class="btn-primary btn-kick">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-                Login with Kick
-            </button>
+            <button id="btn-oauth-login" class="btn-kick">Login with Kick</button>
             <button id="btn-back-profiles" class="btn-ghost hidden">← Back</button>
         </div>
 
@@ -43,39 +40,68 @@
 
 <div id="main-app" class="hidden">
     <div class="toolbar">
-        <div class="toolbar-left">
+
+        <div class="toolbar-section">
             <span class="app-name">KickCatch</span>
             <span id="active-user-badge"></span>
         </div>
 
-        <div class="toolbar-center">
-            <div class="open-controls">
-                <input type="number" id="link-count" min="1" max="10" value="1">
-                <select id="link-order">
-                    <option value="start" id="opt-start">Start</option>
-                    <option value="end" id="opt-end">End</option>
-                    <option value="random" id="opt-random">Random</option>
-                </select>
-                <button id="btn-open" class="btn-primary">Open</button>
-            </div>
+        <div class="toolbar-divider"></div>
+
+        <div class="toolbar-section">
+            <input type="number" id="link-count" min="1" max="10" value="1">
+            <select id="link-order">
+                <option value="start" id="opt-start">Start</option>
+                <option value="end" id="opt-end">End</option>
+                <option value="random" id="opt-random">Random</option>
+            </select>
+            <button id="btn-open" class="btn-primary" title="Open links">Open</button>
             <button id="btn-bonk" class="btn-bonk">Bonk!</button>
-            <button id="btn-spam-delete" class="btn-danger" title="Delete spam links">Spam Sil</button>
         </div>
 
-        <div class="toolbar-right">
+        <div class="toolbar-divider"></div>
+
+        <div class="toolbar-section">
+            <button id="btn-filter-all"  class="btn-filter active" data-filter="all">All</button>
+            <button id="btn-filter-yt"   class="btn-filter" data-filter="youtube" title="YouTube only">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+                YT
+            </button>
+            <button id="btn-filter-ig"   class="btn-filter" data-filter="instagram" title="Instagram only">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                IG
+            </button>
+            <button id="btn-filter-x"    class="btn-filter" data-filter="x.com twitter" title="X / Twitter only">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.736-8.853L1.254 2.25H8.08l4.265 5.638 5.9-5.638zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                X
+            </button>
+            <button id="btn-filter-tiktok" class="btn-filter" data-filter="tiktok" title="TikTok only">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.3 6.3 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
+                TT
+            </button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <div class="toolbar-section">
+            <button id="btn-spam-delete" class="btn-danger">Spam Sil</button>
             <div class="ban-wrapper" id="ban-wrapper">
                 <button id="btn-ban" class="btn-outline">Ban</button>
                 <input type="text" id="ban-input" placeholder="Username...">
             </div>
-            <button id="btn-hide-links" class="btn-outline">Hide</button>
+        </div>
+
+        <div class="toolbar-section toolbar-right">
             <div id="last-opened-badge" class="hidden">
                 <span id="last-opened-count"></span>
             </div>
+            <button id="btn-hide-links" class="btn-outline">Hide</button>
             <select id="app-lang-toggle" class="lang-select">
                 <option value="en">EN</option>
                 <option value="tr">TR</option>
             </select>
         </div>
+
     </div>
 
     <div id="spam-alert" class="spam-alert hidden">

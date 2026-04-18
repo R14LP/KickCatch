@@ -2,3 +2,5 @@ flask
 cloudscraper
 requests
 python-dotenv
+pillow
+pystray
