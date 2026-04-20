@@ -66,6 +66,16 @@ KickCatch is a lightweight, local web-based tool designed to capture and manage 
 -   **Cloudflare Bypass:** Cloudscraper
 -   **System Tray:** pystray, Pillow
 
+## 📋 Changelog
+
+### v1.1
+- Fixed connection issue for users without a matching token entry
+- Improved channel lookup: uses Bearer token with kick.com API directly, Cloudscraper as fallback
+- Removed debug print statements
+
+### v1.0
+- Initial release with OAuth 2.1 login, ban system, platform filters, spam detection, system tray
+
 ## ⚠️ Disclaimer
 
 This tool is for educational and moderation purposes. Kick.com may update their API or Cloudflare protections at any time, which could temporarily affect functionality.

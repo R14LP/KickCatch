@@ -120,13 +120,24 @@ def logout():
 @app.route("/api/get_room", methods=["POST"])
 def get_room():
     try:
-        req_data = request.get_json()
-        username = req_data.get("username")
-        scraper  = cloudscraper.create_scraper(browser={
-            "browser": "chrome", "platform": "windows", "mobile": False
-        })
-        res  = scraper.get(f"https://kick.com/api/v1/channels/{username}",
-                           headers={"Accept": "application/json"}, timeout=10)
+        req_data     = request.get_json()
+        username     = req_data.get("username")
+        tokens       = load_tokens()
+        access_token = tokens.get(username, {}).get("access_token")
+        if not access_token:
+            for v in tokens.values():
+                if v.get("access_token"):
+                    access_token = v["access_token"]
+                    break
+
+        headers = {"Accept": "application/json"}
+        if access_token:
+            headers["Authorization"] = f"Bearer {access_token}"
+
+        res  = requests.get(
+            f"https://kick.com/api/v1/channels/{username}",
+            headers=headers, timeout=10
+        )
         data = res.json()
         return jsonify({
             "id":             data["chatroom"]["id"],
@@ -134,7 +145,20 @@ def get_room():
         })
     except Exception as e:
         print("Kick API error:", e)
-        return jsonify({"id": None})
+        scraper = cloudscraper.create_scraper(browser={
+            "browser": "chrome", "platform": "windows", "mobile": False
+        })
+        try:
+            res  = scraper.get(f"https://kick.com/api/v1/channels/{username}",
+                               headers={"Accept": "application/json"}, timeout=10)
+            data = res.json()
+            return jsonify({
+                "id":             data["chatroom"]["id"],
+                "broadcaster_id": data.get("user_id") or data.get("id"),
+            })
+        except Exception as e2:
+            print("Cloudscraper fallback error:", e2)
+            return jsonify({"id": None})
 
 @app.route("/api/ban", methods=["POST"])
 def ban_user():
