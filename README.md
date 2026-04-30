@@ -6,12 +6,12 @@ KickCatch is a lightweight, local web-based tool designed to capture and manage 
 
 -   **Real-time Link Capturing:** Connects directly to Kick's WebSocket (Pusher) infrastructure to instantly catch links.
 -   **Safe Viewing:** Links are queued and can be safely opened in background tabs.
--   **Multiple Link Opening:** Open a batch of queued links at once (Start, End, or Random).
+-   **Multiple Link Opening:** Open 1x, 3x, 5x, or 10x links at once (Start, End, or Random).
 -   **Platform Filters:** Filter links by platform — YouTube, Instagram, X/Twitter, TikTok.
 -   **OAuth Authentication:** Login with your Kick account securely via OAuth 2.1 — your password is never stored.
 -   **Ban System:** Instantly ban users directly from the panel using the official Kick Moderation API.
 -   **"Bonk!" System:** View recently opened links and who sent them, with an animated emote.
--   **Spam Detection:** Removes duplicate links — keeps the first occurrence, deletes the rest.
+-   **Spam Detection:** Manually remove duplicate links with "Spam Sil", or enable "Oto Spam" to remove them automatically in real-time.
 -   **System Tray:** Runs in the background with a system tray icon. Use "Exit" to fully close.
 -   **Bilingual Support:** Fully supports English and Turkish (TR/EN).
 
@@ -68,10 +68,13 @@ KickCatch is a lightweight, local web-based tool designed to capture and manage 
 
 ## 📋 Changelog
 
+### v1.2
+- Replaced number input with 1x / 3x / 5x / 10x quick-select buttons
+- Added "Oto Spam" toggle — automatically removes duplicate links in real-time
+
 ### v1.1
-- Fixed connection issue for users without a matching token entry
-- Improved channel lookup: uses Bearer token with kick.com API directly, Cloudscraper as fallback
-- Removed debug print statements
+- Fixed "Connection failed: Room not found" error for new users
+- Channel lookup now uses Bearer token directly, Cloudscraper as fallback
 
 ### v1.0
 - Initial release with OAuth 2.1 login, ban system, platform filters, spam detection, system tray

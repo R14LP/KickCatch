@@ -44,6 +44,8 @@ let activeUser = null;
 let activeBroadcasterId = null;
 let linksHidden = false;
 let activeFilter = 'all';
+let linkCount = 1;
+let autoSpam = false;
 
 const $ = id => document.getElementById(id);
 
@@ -70,7 +72,6 @@ const banWrapper        = $('ban-wrapper');
 const banInput          = $('ban-input');
 const btnBan            = $('btn-ban');
 const linksContainer    = $('links-container');
-const linkCountInput    = $('link-count');
 const linkOrderSelect   = $('link-order');
 const emoteContainer    = $('emote-container');
 const bonkNames         = $('bonk-names');
@@ -115,6 +116,19 @@ function updateLang() {
     if (loginLangToggle) loginLangToggle.value = lang;
     if (appLangToggle) appLangToggle.value = lang;
 }
+
+document.querySelectorAll('.btn-count').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.btn-count').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        linkCount = parseInt(btn.dataset.count);
+    });
+});
+
+const toggleAutoSpam = $('toggle-auto-spam');
+toggleAutoSpam?.addEventListener('change', () => {
+    autoSpam = toggleAutoSpam.checked;
+});
 
 loginLangToggle?.addEventListener('change', e => { lang = e.target.value; updateLang(); });
 appLangToggle?.addEventListener('change', e => { lang = e.target.value; updateLang(); });
@@ -228,6 +242,7 @@ async function connectToKick(username) {
                     time: new Date(),
                 });
             });
+            if (autoSpam) runAutoSpam();
             renderLinks();
         });
 
@@ -239,6 +254,7 @@ async function connectToKick(username) {
     }
 }
 
+// ── PLATFORM FILTER ──
 function matchesFilter(url) {
     if (activeFilter === 'all') return true;
     try {
@@ -257,11 +273,26 @@ document.querySelectorAll('.btn-filter').forEach(btn => {
     });
 });
 
+// ── SPAM: duplicate URL silme ──
+function runAutoSpam() {
+    const seenUrls = new Set();
+    const toDelete = new Set();
+    linksQueue.forEach(link => {
+        if (link.opened) return;
+        if (seenUrls.has(link.url)) toDelete.add(link.id);
+        else seenUrls.add(link.url);
+    });
+    if (toDelete.size > 0) {
+        linksQueue = linksQueue.filter(l => !toDelete.has(l.id));
+    }
+}
+
 btnSpamDelete?.addEventListener('click', () => {
     const seenUrls = new Set();
     const toDelete = new Set();
     const spamUsers = new Set();
 
+    // ilk görülen URL'yi tut, sonrakileri işaretle
     [...linksQueue].forEach(link => {
         if (link.opened) return;
         if (seenUrls.has(link.url)) {
@@ -285,6 +316,7 @@ btnSpamDelete?.addEventListener('click', () => {
 
 spamAlertClose?.addEventListener('click', () => spamAlert.classList.add('hidden'));
 
+// ── RENDER ──
 function getFavicon(url) {
     try {
         const domain = new URL(url).hostname;
@@ -354,14 +386,8 @@ function updateLastOpenedBadge() {
     }
 }
 
-linkCountInput?.addEventListener('change', function () {
-    let v = parseInt(this.value);
-    if (isNaN(v) || v < 1) this.value = 1;
-    else if (v > 10) this.value = 10;
-});
-
 btnOpen?.addEventListener('click', () => {
-    let count = parseInt(linkCountInput.value);
+    let count = linkCount;
     const order = linkOrderSelect.value;
     const available = linksQueue.filter(l => !l.opened && matchesFilter(l.url));
     if (!available.length) return;

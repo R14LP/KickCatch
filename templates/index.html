@@ -49,7 +49,12 @@
         <div class="toolbar-divider"></div>
 
         <div class="toolbar-section">
-            <input type="number" id="link-count" min="1" max="10" value="1">
+            <div class="count-btns">
+                <button class="btn-count active" data-count="1">1x</button>
+                <button class="btn-count" data-count="3">3x</button>
+                <button class="btn-count" data-count="5">5x</button>
+                <button class="btn-count" data-count="10">10x</button>
+            </div>
             <select id="link-order">
                 <option value="start" id="opt-start">Start</option>
                 <option value="end" id="opt-end">End</option>
@@ -85,6 +90,13 @@
 
         <div class="toolbar-section">
             <button id="btn-spam-delete" class="btn-danger">Spam Sil</button>
+            <label class="switch-label">
+                <span class="switch-text">Oto Spam</span>
+                <div class="toggle-switch">
+                    <input type="checkbox" id="toggle-auto-spam">
+                    <span class="toggle-slider"></span>
+                </div>
+            </label>
             <div class="ban-wrapper" id="ban-wrapper">
                 <button id="btn-ban" class="btn-outline">Ban</button>
                 <input type="text" id="ban-input" placeholder="Username...">
